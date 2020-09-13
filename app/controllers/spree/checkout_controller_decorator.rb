@@ -1,6 +1,8 @@
-Spree::CheckoutController.class_eval do
-  before_action :set_affilate, only: :update
-  after_action :clear_session, only: :update
+module Spree::CheckoutControllerDecorator
+  def self.prepended(base)
+    base.before_action :set_affilate, only: :update
+    base.after_action :clear_session, only: :update
+  end
 
   private
     def set_affilate
@@ -13,3 +15,4 @@ Spree::CheckoutController.class_eval do
       session[:affiliate] = nil if @order.completed?
     end
 end
+Spree::CheckoutController.prepend Spree::CheckoutControllerDecorator

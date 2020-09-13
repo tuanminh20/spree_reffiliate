@@ -1,19 +1,19 @@
-Spree::User.class_eval do
+module Spree::UserDecorator
   include Spree::TransactionRegistrable
-  attr_accessor :referral_code, :affiliate_code, :can_activate_associated_partner
+  def self.prepended(base)
+    base.attr_accessor :referral_code, :affiliate_code, :can_activate_associated_partner
+    base.has_one :referral
+    base.has_one :referred_record
+    base.has_one :affiliate, through: :referred_record, foreign_key: :affiliate_id
+    base.has_one :affiliate_record, class_name: 'Spree::ReferredRecord'
+    base.has_many :transactions, as: :commissionable, class_name: 'Spree::CommissionTransaction', dependent: :restrict_with_error
 
-  has_one :referral
-  has_one :referred_record
-  has_one :affiliate, through: :referred_record, foreign_key: :affiliate_id
-  has_one :affiliate_record, class_name: 'Spree::ReferredRecord'
-  has_many :transactions, as: :commissionable, class_name: 'Spree::CommissionTransaction', dependent: :restrict_with_error
-
-  after_create :create_referral
-  after_create :process_referral
-  after_create :process_affiliate
-  after_update :activate_associated_partner, if: :associated_partner_activable?
-
-  validates :referral_credits, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+    base.after_create :create_referral
+    base.after_create :process_referral
+    base.after_create :process_affiliate
+    base.after_update :activate_associated_partner, if: :associated_partner_activable?
+    base.validates :referral_credits, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  end
 
   def referred_by
     referred_record.try(:referral).try(:user)
@@ -96,3 +96,4 @@ Spree::User.class_eval do
       @store_credit_category ||= Spree::StoreCreditCategory.find_or_create_by(name: Spree::StoreCredit::REFERRAL_STORE_CREDIT_CATEGORY)
     end
 end
+Spree::User.prepend Spree::UserDecorator

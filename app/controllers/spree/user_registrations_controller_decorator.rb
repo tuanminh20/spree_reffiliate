@@ -1,8 +1,9 @@
-Spree::UserRegistrationsController.class_eval do
-
-  before_action :check_referral_and_affiliate, only: :create
-  after_action :reset_referral_session, only: :create
-  after_action :reset_affiliate_session, only: :create
+module Spree::UserRegistrationsControllerDecorator
+  def self.prepended(base)
+    base.before_action :check_referral_and_affiliate, only: :create
+    base.after_action :reset_referral_session, only: :create
+    base.after_action :reset_affiliate_session, only: :create
+  end
 
   private
 
@@ -23,3 +24,4 @@ Spree::UserRegistrationsController.class_eval do
   end
 
 end
+Spree::UserRegistrationsController.prepend Spree::UserRegistrationsControllerDecorator

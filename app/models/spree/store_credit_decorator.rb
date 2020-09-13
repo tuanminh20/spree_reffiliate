@@ -1,9 +1,10 @@
-Spree::StoreCredit.class_eval do
-  Spree::StoreCredit::REFERRAL_STORE_CREDIT_CATEGORY = 'Referral Credit'
+module Spree::StoreCreditDecorator
+  # Spree::StoreCredit::REFERRAL_STORE_CREDIT_CATEGORY = 'Referral Credit'
+  def self.prepended(base)
+    base.has_one :referred_record
 
-  has_one :referred_record
-
-  after_commit :send_credit_reward_information, on: :create, if: :referral?
+    base.after_commit :send_credit_reward_information, on: :create, if: :referral?
+  end
 
   private
     def referral?
@@ -14,3 +15,5 @@ Spree::StoreCredit.class_eval do
       Spree::ReferralMailer.credits_awarded(user, amount.to_f).deliver_later
     end
 end
+
+Spree::StoreCredit.prepend Spree::StoreCreditDecorator
