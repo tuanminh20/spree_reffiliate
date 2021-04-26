@@ -8,7 +8,7 @@ module Spree
                                              association_foreign_key: 'affiliate_id'
 
         def eligible?(order, _options = {})
-          order.user and order.user.affiliate? and affiliate_ids.include?(order.user.affiliate.id)
+          order.user&.affiliate? and affiliate_ids.include?(order.user.affiliate.id)
         end
 
         def applicable?(promotable)

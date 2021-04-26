@@ -19,9 +19,10 @@ module Spree
     def initialize(transaction)
       @transaction = transaction
       @affiliate = transaction.affiliate
-      if @transaction.commissionable_type.eql? 'Spree::User'
+      case @transaction.commissionable_type
+      when 'Spree::User'
         @affiliate_commission_rule = affiliate.affiliate_commission_rules.active.user_registration.first
-      elsif @transaction.commissionable_type.eql? 'Spree::Order'
+      when 'Spree::Order'
         @affiliate_commission_rule = affiliate.affiliate_commission_rules.active.order_placement.first
       end
     end

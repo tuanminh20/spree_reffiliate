@@ -34,7 +34,7 @@ module Spree
     end
 
     def referred_users
-      referred_records.includes(:user).collect(&:user).compact
+      referred_records.includes(:user).filter_map(&:user)
     end
 
     def referred_orders
