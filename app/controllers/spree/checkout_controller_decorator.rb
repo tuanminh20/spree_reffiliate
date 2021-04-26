@@ -5,14 +5,13 @@ module Spree::CheckoutControllerDecorator
   end
 
   private
-    def set_affilate
-      if @order.payment? && session[:affiliate]
-        @order.affiliate = Spree::Affiliate.find_by(path: session[:affiliate])
-      end
-    end
 
-    def clear_session
-      session[:affiliate] = nil if @order.completed?
-    end
+  def set_affilate
+    @order.affiliate = Spree::Affiliate.find_by(path: session[:affiliate]) if @order.payment? && session[:affiliate]
+  end
+
+  def clear_session
+    session[:affiliate] = nil if @order.completed?
+  end
 end
 Spree::CheckoutController.prepend Spree::CheckoutControllerDecorator

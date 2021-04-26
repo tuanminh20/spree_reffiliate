@@ -7,7 +7,9 @@ FactoryGirl.define do
     layout nil
 
     after(:build) do |affiliate|
-      Spree::CommissionRule.all.map { |comm_rule| affiliate.affiliate_commission_rules.find_or_initialize_by(commission_rule_id: comm_rule.id, rate: 10) }
+      Spree::CommissionRule.all.map do |comm_rule|
+        affiliate.affiliate_commission_rules.find_or_initialize_by(commission_rule_id: comm_rule.id, rate: 10)
+      end
     end
   end
 
@@ -31,8 +33,8 @@ FactoryGirl.define do
     end_date Date.current.end_of_month
     factory(:commission_with_transactions) do
       after(:create) do
-        self.transactions.create(commissionable: create(:order), affiliate: create(:affiliate))
-        self.transactions.create(commissionable: create(:user), affiliate: create(:affiliate))
+        transactions.create(commissionable: create(:order), affiliate: create(:affiliate))
+        transactions.create(commissionable: create(:user), affiliate: create(:affiliate))
       end
     end
   end

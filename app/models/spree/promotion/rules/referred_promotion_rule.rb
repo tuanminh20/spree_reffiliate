@@ -2,8 +2,7 @@ module Spree
   class Promotion
     module Rules
       class ReferredPromotionRule < Spree::PromotionRule
-
-        def eligible?(order, options = {})
+        def eligible?(order, _options = {})
           order.user and order.user.referred?
         end
 

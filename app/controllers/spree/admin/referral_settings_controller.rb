@@ -6,7 +6,7 @@ module Spree
       def update
         Spree::Config[:referrer_benefit_enabled] = params[:referrer_benefit_enabled] == '1'
         Spree::Config[:referral_credits] = params[:referral_credits]
-        flash[:success] = Spree.t(:successful, scope: "referral_settings.update")
+        flash[:success] = Spree.t(:successful, scope: 'referral_settings.update')
         redirect_to edit_admin_referral_settings_path
       end
 
@@ -14,7 +14,7 @@ module Spree
 
       def check_credit_amount
         if params[:referral_credits].to_f < 0
-          flash[:error] = Spree.t(:unsuccessful, scope: "referral_settings.update")
+          flash[:error] = Spree.t(:unsuccessful, scope: 'referral_settings.update')
           redirect_to edit_admin_referral_settings_path
         end
       end

@@ -6,10 +6,10 @@ module Spree
     validates :start_date, :end_date, presence: true
     validate :cannot_mark_unpaid
     validate :eligiblity_of_dates
-    validate :eligible_to_be_paid, if: [:paid_changed?, :paid]
+    validate :eligible_to_be_paid, if: %i[paid_changed? paid]
 
     self.whitelisted_ransackable_associations = %w[affiliate]
-    self.whitelisted_ransackable_attributes =  %w[start_date end_date paid]
+    self.whitelisted_ransackable_attributes = %w[start_date end_date paid]
 
     define_model_callbacks :mark_paid, only: :after
 
@@ -31,25 +31,30 @@ module Spree
     end
 
     private
-      def lock_transactions
-        transactions.update_all(locked: true)
-      end
 
-      def cannot_mark_unpaid
-        errors.add(:base, Spree.t(:cannot_mark_unpaid, scope: :commission)) if !paid? && paid_changed?
-      end
+    def lock_transactions
+      transactions.update_all(locked: true)
+    end
 
-      def eligiblity_of_dates
-        if(start_date && end_date)
-          errors.add(:base, Spree.t(:unsuitable_date_range, scope: :commission)) if (start_date > end_date)
-          errors.add(:base, Spree.t(:dates_ineligible, scope: :commission)) if (start_date < Time.current.beginning_of_month || end_date > Time.current.end_of_month)
-        else
-          errors.add(:base, Spree.t(:dates_ineligible, scope: :commission))
+    def cannot_mark_unpaid
+      errors.add(:base, Spree.t(:cannot_mark_unpaid, scope: :commission)) if !paid? && paid_changed?
+    end
+
+    def eligiblity_of_dates
+      if start_date && end_date
+        errors.add(:base, Spree.t(:unsuitable_date_range, scope: :commission)) if start_date > end_date
+        if start_date < Time.current.beginning_of_month || end_date > Time.current.end_of_month
+          errors.add(:base,
+                     Spree.t(:dates_ineligible,
+                             scope: :commission))
         end
+      else
+        errors.add(:base, Spree.t(:dates_ineligible, scope: :commission))
       end
+    end
 
-      def eligible_to_be_paid
-        errors.add(:base, Spree.t(:not_eligible, scope: [:commission, :paid])) if can_marked_paid?
-      end
+    def eligible_to_be_paid
+      errors.add(:base, Spree.t(:not_eligible, scope: %i[commission paid])) if can_marked_paid?
+    end
   end
 end

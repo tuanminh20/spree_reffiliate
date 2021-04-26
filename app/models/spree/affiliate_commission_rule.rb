@@ -12,13 +12,18 @@ module Spree
     before_create :assign_type_of_commission
 
     scope :active, -> { where(active: true) }
-    scope :user_registration, -> { includes(:commission_rule).where(spree_commission_rules: { name: Spree::CommissionRule::USER_REGISTRATION }) }
-    scope :order_placement, ->   { includes(:commission_rule).where(spree_commission_rules: { name: Spree::CommissionRule::ORDER_PLACEMENT }) }
+    scope :user_registration, lambda {
+                                includes(:commission_rule).where(spree_commission_rules: { name: Spree::CommissionRule::USER_REGISTRATION })
+                              }
+    scope :order_placement, lambda   {
+                              includes(:commission_rule).where(spree_commission_rules: { name: Spree::CommissionRule::ORDER_PLACEMENT })
+                            }
 
     private
-      def assign_type_of_commission
-        self.fixed_commission = commission_rule.fixed_commission
-        return true
-      end
+
+    def assign_type_of_commission
+      self.fixed_commission = commission_rule.fixed_commission
+      true
+    end
   end
 end

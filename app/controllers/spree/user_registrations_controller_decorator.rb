@@ -12,9 +12,7 @@ module Spree::UserRegistrationsControllerDecorator
   end
 
   def reset_referral_session
-    if @user.persisted?
-      session[:referral] = nil
-    end
+    session[:referral] = nil if @user.persisted?
   end
 
   def reset_affiliate_session
@@ -22,6 +20,5 @@ module Spree::UserRegistrationsControllerDecorator
       session[:affiliate] = nil
     end
   end
-
 end
 Spree::UserRegistrationsController.prepend Spree::UserRegistrationsControllerDecorator
